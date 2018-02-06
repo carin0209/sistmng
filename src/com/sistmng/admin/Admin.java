@@ -55,9 +55,19 @@ public class Admin {
 	private LocalDate testDate; // 시험날짜
 
 	private String testFile; // 시험문제파일
+	
+	private String instStatus; //강의상태
+	
+	
+	
+	public String getInstStatus() {
+		return instStatus;
+	}
 
-	
-	
+	public void setInstStatus(String instStatus) {
+		this.instStatus = instStatus;
+	}
+
 	public String getMemberStatus() {
 
 		return memberStatus;

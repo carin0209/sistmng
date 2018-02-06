@@ -458,11 +458,173 @@ public class AdminService {
 	//-----------------------------------------------
 	
 	//2. 강사 계정 관리
+	
+	public void InstructorMenu(Scanner sc) {
+		
+		boolean run = true;
+		
+		while(run) {
+			
+		System.out.println("---------------------------------------------------------");
+		System.out.println("1.강사 목록 2.강사 등록 3.강사 삭제 0.종료");
+		System.out.println("---------------------------------------------------------");
+		
+		int num = sc.nextInt();
+		sc.nextLine();
+		
+		switch(num) {
+		
+		case 0 : run=false; break;
+		case 1: (sc); break;
+		case 2: (sc);break;
+		case 3: (sc);break;
+		
+		}
+			
+		}
+		
+	}
+	
+	
 	//2.1 강사 목록
+	
+	public void InstructorList(Scanner sc) {
+	
+		List<Admin>list = this.dao.InstructorList();
+		
+		
+		System.out.println("------------------------------------------------------------------");
+		System.out.println("강사번호 / 이름 / 주민번호 / 전화번호 / 강의가능과목 / 강사등록일 ");
+		System.out.println("------------------------------------------------------------------");
+		
+		for(Admin m : list) {
+			System.out.printf(String.format("%s / %s / %s / %s / %s / %s %n"),m.getMid(),m.getName_(),m.getSsn(),m.getPhone(),m.getSubjectName(),m.getInstructorRegDate());
+		}
+		boolean run = true;
+		
+		while(run) {
+		
+		System.out.println("------------------------------------------------------------");
+		System.out.println("1.상세보기 2.강의가능과목 추가 3.강의가능과목 삭제 0.나가기");
+		System.out.println("------------------------------------------------------------");
+		
+		
+		int num = sc.nextInt();
+		sc.nextLine();
+		
+		System.out.print("선택 >");
+		
+		switch(num) {
+		
+		case 0 : run=false; break;
+		case 1: this.InstructorSubjectDetailList(sc); break;
+		case 2: break;
+		case 3: break;
+		
+		
+		}
+			
+		}
+		
+		
+	}
+	
 	//2.1.1 강사상세보기
+	
+	public void InstructorSubjectDetailList(Scanner sc) {
+		
+		
+		System.out.print("강사번호 >");
+		String value = sc.next();
+		
+		Admin m = new Admin();
+		
+		m.setMid(value);
+		
+		
+		List<Admin>list1 = this.dao.midNameList(value);
+		
+		List<Admin>list2 = this.dao.InstructorSubjectDetailList(value);
+		
+		for (Admin m1 : list1) {
+			if(m1.getMid().equals(value)) {
+				System.out.printf(String.format("[ %s / %s ] 강사님 %n", m1.getMid(),m1.getName_()));
+			} else {
+				System.out.println("검색 결과가 없습니다.");
+			}
+		}
+		
+		System.out.println("--------------------------------------------------------------------------------------------------------------------------");
+		
+		for(Admin m2 : list2) {
+			System.out.printf(String.format(" %s / %s / %s / %s / %s / %s / %s / %s / %s %n", m2.getSubjectName(),m2.getOpenSubCode(),m2.getOpenSubStartDate(),m2.getOpenSubCloseDate(),m2.getCourseName(),m2.getOpenCoStartDate(),m2.getOpenCoCloseDate(),m2.getClassName(),m2.getInstStatus() ));
+		}
+		System.out.println("--------------------------------------------------------------------------------------------------------------------------");
+		
+	}
+	
+	
 	//2.1.2 강의가능과목 추가
+	
+	public void InstructorSubjectAdd(Scanner sc) {
+	
+	System.out.print("강사번호 > ");
+	String mid = sc.next();
+	System.out.print("추가과목번호 > ");
+	String subjectCode = sc.next();
+	
+	int result = dao.InstructorSubjectAdd(mid,subjectCode);
+	
+	if(result > 0) {
+		System.out.printf(String.format("[%s / %s ]과목이 성공적으로 추가되었습니다.%n",mid,subjectCode));
+	} else {
+		System.out.println("이미 존재하는 과목입니다.");
+	}
+	
+	}
+	
+	
 	//2.1.3 강의가능과목 삭제
+	
+	public void InstructorSubjectDelete(Scanner sc) {
+		
+
+		
+		
+		System.out.print("강사번호 >");
+		String mid = sc.next();
+		
+		System.out.print("삭제과목번호 >");
+		String subjectCode = sc.next();
+		
+		Admin m = new Admin();
+
+		m.setMid(mid);
+		m.setSubjectCode(subjectCode);
+		
+		System.out.printf(String.format("[ %s / %s ] 과목을 삭제하시겠습니까 (y/n)?", mid,subjectCode));
+		String yn = sc.next();
+		
+		if (yn.equalsIgnoreCase("y")) {
+			
+			int result = dao.InstructorSubjectDelete(mid, subjectCode);
+			
+			if (result > 0) {
+			System.out.printf(String.format("[ %s / %s ] 과목이 성공적으로 삭제되었습니다.",mid,subjectCode));
+			} else {
+				System.out.println("삭제가 정상적으로 이루어지지 않았습니다.");
+			}
+			
+		} else if (yn.equalsIgnoreCase("n")) {
+			return;
+		} else {
+			System.out.println("올바른 입력이 아닙니다.");
+			return;
+		}
+		
+	}
 	//2.2 강사 등록
+	
 	//2.3 강사 삭제
 	
 	//-----------------------------------------------

@@ -2,11 +2,64 @@ package com.sistmng.admin;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.sistmng.*;
 
 public class AdminDAO {
+	
+	
+	public List<Admin> info() {
+		
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String courseCode = rs.getString("courseCode");
+				String courseName = rs.getString("courseName");
+				
+				Admin m = new Admin();
+				
+				m.setCourseCode(courseCode);
+				m.setCourseName(courseName);
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+		
+		
+	}
 
 	// -----------------------------------------------
 
@@ -778,61 +831,461 @@ public class AdminDAO {
 	// -----------------------------------------------
 
 	// 2. 강사 계정 관리
+	
+	//현재 날짜 구하는 변수
+	private LocalDate now = LocalDate.now();
+	
+	//회원번호,이름 구하는 메소드
+	public List<Admin>midNameList(String value) {
+		
 
-	// 2.1 강사 목록
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		sql += " WHERE memberStatus = I";
+		sql += " AND name_ = ?";
 
-	private String InstructorList() {
-
-		String result = null;
-
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String mid = rs.getString("mid");
+				String name_ = rs.getString("name_");
+				
+				Admin m = new Admin();
+				
+				m.setMid(mid); 
+				m.setName_(name_);
+				
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
 		return result;
+
+		
 
 	}
+	
+	
+	
+	// 2.1 강사 목록
 
-	private String InstructorSearch() {
+	public List<Admin>InstructorList() {
+		
 
-		String result = null;
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		sql += " WHERE memberStatus = I";
 
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String mid = rs.getString("mid");
+				String name_ = rs.getString("name_");
+				String ssn = rs.getString("ssn");
+				String phone = rs.getString("phone");
+				String subjectName = rs.getString("subjectName");
+				String instructorRegDate = rs.getString("instructorRegDate");
+				
+				Admin m = new Admin();
+				
+				m.setMid(mid); 
+				m.setName_(name_);
+				m.setSsn(ssn);
+				m.setPhone(phone);
+				m.setSubjectCode(subjectName);
+				m.setInstructorRegDate(LocalDate.parse(instructorRegDate));
+				
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
 		return result;
+
+		
 
 	}
 
 	// 2.1.1 강사상세보기
 
-	public String InstructorSubjectDetailList() {
-
-		String result = null;
-
+	public List<Admin> InstructorSubjectDetailList(String value) {
+		
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		   sql += " WHERE mid = ?";
+		   sql += " AND memberStatus = I";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String subjectName = rs.getString("subjectName");
+				String openSubCode = rs.getString("openSubCode");
+				String openSubStartDate = rs.getString("openSubStartDate");
+				String openSubCloseDate = rs.getString("openSubCloseDate");
+				String courseName = rs.getString("courseName");
+				String openCoStartDate = rs.getString("openCoStartDate");
+				String openCoCloseDate = rs.getString("openCoCloseDate");
+				String className = rs.getString("className");
+				
+				Admin m = new Admin();
+				
+				m.setSubjectName(subjectName);
+				m.setOpenSubCode(openSubCode);
+				m.setOpenSubStartDate(LocalDate.parse(openSubStartDate));
+				m.setOpenSubCloseDate(LocalDate.parse(openSubCloseDate));
+				m.setCourseName(courseName);
+				m.setOpenCoStartDate(LocalDate.parse(openCoStartDate));
+				m.setOpenCoCloseDate(LocalDate.parse(openCoCloseDate));
+				m.setClassName(className);
+				
+				if(m.getOpenCoCloseDate().isAfter(now)) {
+					m.setInstStatus("강의종료");
+				} else if (m.getOpenCoCloseDate().isBefore(now) && m.getOpenCoStartDate().isBefore(now)) {
+					m.setInstStatus("강의중");
+				} else {
+					m.setInstStatus("강의 예정");
+				}
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
 		return result;
+
+		
+		
 
 	}
 
 	// 2.1.2 강의가능과목 추가
 
-	public String InstructorSubjectAdd() {
+	public int InstructorSubjectAdd(String mid,String subjectCode) {
 
-		String result = null;
+		int result = 0;
+		
+		String sql = "";
+		
+		   sql += " WHERE mid = ?";
+		   sql += " AND subjectCode = ?";
+		   
+		   sql += " AND memberStatus = I";
+	
 
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			
+			pstmt.setString(1,mid);
+			pstmt.setString(2,subjectCode);
+			
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
 		return result;
 
 	}
 
 	// 2.1.3 강의가능과목 삭제
 
-	public String InstructorSubjectDelete() {
+	public int InstructorSubjectDelete(String mid,String subjectCode) {
 
-		String result = null;
+		int result = 0;
+		
+		String sql = "";
+		
+		   sql += " WHERE mid = ?";
+		   sql += " AND memberStatus = I";
 
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,mid);
+			pstmt.setString(2,subjectCode);
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+
+	}
+	
+	//2.2 강사 등록 출력 리스트
+	public List<Admin> InstructorAddList(Admin m) {
+		
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		sql += " WHERE name_ = ? ";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String mid = rs.getString("mid");
+				String name_ = rs.getString("name_");
+				String ssn = rs.getString("ssn");
+				String phone = rs.getString("phone");
+				String memberRegDate = rs.getString("memberRegDate");
+				String memberStatus = rs.getString("memberStatus");
+				
+				Admin m = new Admin();
+				
+				m.setMid(mid);
+				m.setName_(name_);
+				m.setSsn(ssn);
+				m.setPhone(phone);
+				m.setMemberRegDate(LocalDate.parse(memberRegDate));
+				m.setMemberStatus(memberStatus);
+
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
 		return result;
 
 	}
 
-	// 2.2 강사 등록
+	// 2.2 강사 등록(기존회원)
 
-	public String InstructorAdd() {
+	public int InstructorAdd(Admin m,String key) {
 
-		String result = null;
+		int result = 0;
+		
+		
+		String sql = "";
+		
 
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,m.getMid());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+
+	}
+	
+	//2.2 강사등록 (신규회원)
+	public int InstructorAddNew(Admin m,String key) {
+
+		int result = 0;
+		
+		
+		String sql = "";
+		
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, "name_");
+			pstmt.setString(2, "ssn");
+			pstmt.setString(3, "phone");
+			pstmt.setString(4, "memberRegDate");
+			
+			
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
 		return result;
 
 	}
@@ -842,14 +1295,121 @@ public class AdminDAO {
 	// [삭제 가능 강사] -> (cf.개설과목등록여부로 판단, 강의가능과목은 cascade옵션 사용,
 
 	// 강사와 회원가입테이블 같이 DELETE)
+	
+	//2.2 강사 등록 출력 리스트
+	public List<Admin> deleteList(String key,String value) {
+		
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		switch (key) {
+		  case "강사명":
+		   sql += " WHERE name_ = ? ";
+		   sql += " AND memberStatus = I";
+		   break;
+		 }
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String mid = rs.getString("mid");
+				String name_ = rs.getString("name_");
+				String ssn = rs.getString("ssn");
+				String phone = rs.getString("phone");
+				String memberRegDate = rs.getString("memberRegDate");
+				String memberStatus = rs.getString("memberStatus");
+				
+				Admin m = new Admin();
+				
+				m.setMid(mid);
+				m.setName_(name_);
+				m.setSsn(ssn);
+				m.setPhone(phone);
+				m.setMemberRegDate(LocalDate.parse(memberRegDate));
+				m.setMemberStatus(memberStatus);
 
-	public String InstructorDelete() {
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
 
-		String result = null;
+	}
+	
+
+	public int InstructorDelete(Admin m,String key) {
+
+		int result = 0;
+		
+		String sql = "";
+		
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1,m.getMid());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+			
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
 
 		return result;
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 	// -----------------------------------------------
 

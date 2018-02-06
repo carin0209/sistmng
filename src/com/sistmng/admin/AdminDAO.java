@@ -114,10 +114,13 @@ public class AdminDAO {
 		
 		return result;
 	}
+	
+	
+	
 
 	// 1.1.1 과정입력
 
-	public int courseAdd(Admin m) {
+	public int courseAdd(String value) {
 		
 		int result = 0;
 		
@@ -130,7 +133,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getCourseName());
+			pstmt.setString(1,value);
 			
 			
 			result = pstmt.executeUpdate();
@@ -159,7 +162,7 @@ public class AdminDAO {
 
 	// 1.1.2 과정삭제
 
-	public int courseDelete(Admin m) {
+	public int courseDelete(String value) {
 
 		int result = 0;
 		
@@ -172,7 +175,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getCourseName());
+			pstmt.setString(1,value);
 			
 			
 			result = pstmt.executeUpdate();
@@ -250,6 +253,67 @@ public class AdminDAO {
 		
 		return result;
 	}
+	
+	//과정 이름 물어보는 메소드
+	public List<Admin>courseNameList(String value) {
+		
+
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		sql += " AND courseCode = ?";
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String courseCode = rs.getString("courseCode");
+				String courseName = rs.getString("courseName");
+				
+				Admin m = new Admin();
+				
+				m.setCourseCode(courseCode);
+				m.setCourseName(courseName);
+				
+				
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+
+		
+
+	}
 
 	// 1.2 과목관리
 
@@ -307,7 +371,7 @@ public class AdminDAO {
 
 	// 1.2.1 과목입력
 
-	public int subjectAdd(Admin m) {
+	public int subjectAdd(String value) {
 		
 		int result = 0;
 		
@@ -321,7 +385,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1, m.getSubjectName());
+			pstmt.setString(1, value);
 			
 			
 			result = pstmt.executeUpdate();
@@ -350,7 +414,7 @@ public class AdminDAO {
 
 	// 1.2.2 과목삭제
 
-	public int subjectDelete(Admin m) {
+	public int subjectDelete(String value) {
 
 		int result = 0;
 		
@@ -363,7 +427,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getSubjectCode());
+			pstmt.setString(1,value);
 			
 			
 			result = pstmt.executeUpdate();
@@ -442,6 +506,67 @@ public class AdminDAO {
 		return result;
 
 	}
+	
+	//과목이름 물어보는 메소드
+	public List<Admin>subjectList(String value) {
+		
+
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		sql += " AND subjectCode = ?";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String courseCode = rs.getString("subjectCode");
+				String courseName = rs.getString("subjectName");
+				
+				Admin m = new Admin();
+				
+				m.setCourseCode(courseCode);
+				m.setCourseName(courseName);
+				
+				
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+
+		
+
+	}
 
 	// 1.3 강의실 관리
 
@@ -499,7 +624,7 @@ public class AdminDAO {
 
 	// 1.3.1 강의실 입력
 
-	public int classAdd(Admin m) {
+	public int classAdd(String value1,int value2) {
 
 		int result = 0;
 		
@@ -512,8 +637,8 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getClassName());
-			pstmt.setInt(2,m.getClassQuota());
+			pstmt.setString(1,value1);
+			pstmt.setInt(2,value2);
 			
 			
 			result = pstmt.executeUpdate();
@@ -542,7 +667,7 @@ public class AdminDAO {
 
 	// 1.3.2 강의실 삭제
 
-	public int classDelete(Admin m) {
+	public int classDelete(String value) {
 
 		int result = 0;
 		
@@ -555,7 +680,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getClassCode());
+			pstmt.setString(1,value);
 			
 			
 			result = pstmt.executeUpdate();
@@ -634,6 +759,67 @@ public class AdminDAO {
 		return result;
 
 	}
+	
+	//강의실 물어보는 메소드
+	public List<Admin>classList(String value) {
+		
+
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		sql += " AND classCode = ?";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String classCode = rs.getString("classCode");
+				String className = rs.getString("className");
+				
+				Admin m = new Admin();
+				
+				m.setClassCode(classCode);
+				m.setClassName(className);
+				
+				
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+
+		
+
+	}
 
 	// 1.4 교재 관리
 
@@ -692,7 +878,7 @@ public class AdminDAO {
 
 	// 1.4.1 교재 입력
 
-	public int bookAdd(Admin m) {
+	public int bookAdd(String value1,String value2) {
 
 		int result = 0;
 		
@@ -705,8 +891,8 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getBookName());
-			pstmt.setString(2, m.getBookPublisher());
+			pstmt.setString(1,value1);
+			pstmt.setString(2,value2);
 			
 			result = pstmt.executeUpdate();
 			
@@ -733,7 +919,7 @@ public class AdminDAO {
 
 	// 1.4.2 교재 삭제
 
-	public int bookDelete(Admin m) {
+	public int bookDelete(String value) {
 		
 		int result = 0;
 		
@@ -746,8 +932,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getBookName());
-			pstmt.setString(2, m.getBookPublisher());
+			pstmt.setString(1,value);
 			
 			
 			result = pstmt.executeUpdate();
@@ -827,10 +1012,74 @@ public class AdminDAO {
 
 
 	}
+	
+	//교재 물어보는 메소드
+	public List<Admin>bookList(String value) {
+		
+
+		List<Admin> result = new ArrayList<Admin>();
+		
+		String sql = "";
+		
+		sql += " AND bookCode = ?";
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
+			ResultSet rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				
+				String bookCode = rs.getString("bookCode");
+				String bookName = rs.getString("bookName");
+				String bookPublisher = rs.getString("bookPublisher");
+				
+				Admin m = new Admin();
+				
+				m.setBookCode(bookCode);
+				m.setBookName(bookName);
+				m.setBookPublisher(bookPublisher);
+				
+				
+				
+				result.add(m);
+				
+			}
+			rs.close();
+			
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+		
+		return result;
+
+		
+
+	}
 
 	// -----------------------------------------------
 
 	// 2. 강사 계정 관리
+	
 	
 	//현재 날짜 구하는 변수
 	private LocalDate now = LocalDate.now();
@@ -844,7 +1093,7 @@ public class AdminDAO {
 		String sql = "";
 		
 		sql += " WHERE memberStatus = I";
-		sql += " AND name_ = ?";
+		sql += " AND mid = ?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -1051,9 +1300,8 @@ public class AdminDAO {
 		int result = 0;
 		
 		String sql = "";
-		
-		   sql += " WHERE mid = ?";
-		   sql += " AND subjectCode = ?";
+			
+		   
 		   
 		   sql += " AND memberStatus = I";
 	
@@ -1102,7 +1350,6 @@ public class AdminDAO {
 		
 		String sql = "";
 		
-		   sql += " WHERE mid = ?";
 		   sql += " AND memberStatus = I";
 
 
@@ -1141,7 +1388,7 @@ public class AdminDAO {
 	}
 	
 	//2.2 강사 등록 출력 리스트
-	public List<Admin> InstructorAddList(Admin m) {
+	public List<Admin> InstructorAddList(String value) {
 		
 		List<Admin> result = new ArrayList<Admin>();
 		
@@ -1154,6 +1401,9 @@ public class AdminDAO {
 			conn = SQLConnection.connect();
 			
 			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, value);
+			
 			ResultSet rs = pstmt.executeQuery();
 			
 			while (rs.next()) {
@@ -1202,7 +1452,7 @@ public class AdminDAO {
 
 	// 2.2 강사 등록(기존회원)
 
-	public int InstructorAdd(Admin m,String key) {
+	public int InstructorAdd(String value) {
 
 		int result = 0;
 		
@@ -1217,7 +1467,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getMid());
+			pstmt.setString(1,value);
 			
 			result = pstmt.executeUpdate();
 			
@@ -1244,7 +1494,7 @@ public class AdminDAO {
 	}
 	
 	//2.2 강사등록 (신규회원)
-	public int InstructorAddNew(Admin m,String key) {
+	public int InstructorAddNew(String name_,String ssn,String phone,String memberRegDate) {
 
 		int result = 0;
 		
@@ -1297,18 +1547,15 @@ public class AdminDAO {
 	// 강사와 회원가입테이블 같이 DELETE)
 	
 	//2.2 강사 등록 출력 리스트
-	public List<Admin> deleteList(String key,String value) {
+	public List<Admin> InstructorDeleteList() {
 		
 		List<Admin> result = new ArrayList<Admin>();
 		
 		String sql = "";
 		
-		switch (key) {
-		  case "강사명":
 		   sql += " WHERE name_ = ? ";
 		   sql += " AND memberStatus = I";
-		   break;
-		 }
+
 		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -1316,6 +1563,8 @@ public class AdminDAO {
 			conn = SQLConnection.connect();
 			
 			pstmt = conn.prepareStatement(sql);
+			
+			
 			ResultSet rs = pstmt.executeQuery();
 			
 			while (rs.next()) {
@@ -1324,8 +1573,8 @@ public class AdminDAO {
 				String name_ = rs.getString("name_");
 				String ssn = rs.getString("ssn");
 				String phone = rs.getString("phone");
-				String memberRegDate = rs.getString("memberRegDate");
-				String memberStatus = rs.getString("memberStatus");
+				String subjectName = rs.getString("subjectName");
+				String instructorRegDate = rs.getString("instructorRegDate");
 				
 				Admin m = new Admin();
 				
@@ -1333,8 +1582,8 @@ public class AdminDAO {
 				m.setName_(name_);
 				m.setSsn(ssn);
 				m.setPhone(phone);
-				m.setMemberRegDate(LocalDate.parse(memberRegDate));
-				m.setMemberStatus(memberStatus);
+				m.setSubjectName(subjectName);
+				m.setInstructorRegDate(LocalDate.parse(instructorRegDate));
 
 				result.add(m);
 				
@@ -1363,7 +1612,7 @@ public class AdminDAO {
 	}
 	
 
-	public int InstructorDelete(Admin m,String key) {
+	public int InstructorDelete(String value) {
 
 		int result = 0;
 		
@@ -1377,7 +1626,7 @@ public class AdminDAO {
 			
 			pstmt = conn.prepareStatement(sql);
 			
-			pstmt.setString(1,m.getMid());
+			pstmt.setString(1,value);
 			
 			result = pstmt.executeUpdate();
 			
@@ -1589,7 +1838,7 @@ public class AdminDAO {
 
 	// 5.2 수강생 출력(중도탈락 관리)
 
-	public String studentSearch() {
+	public String studentSearch1() {
 
 		// dropOut() 메소드 호출
 
@@ -1623,7 +1872,7 @@ public class AdminDAO {
 
 	// 5.4 수강생 삭제
 
-	public String studentDelete() {
+	public String studentDelete1() {
 
 		String result = null;
 
@@ -1645,7 +1894,7 @@ public class AdminDAO {
 
 	// 5.4.2 수강생 삭제
 
-	public String studentDelete() {
+	public String studentDelete2() {
 
 		// studentSearch() 호출
 

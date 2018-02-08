@@ -1,44 +1,46 @@
 package com.sistmng.admin;
 
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.sistmng.*;
+import com.sistmng.SQLConnection;
+
+import java.sql.*;
+import java.time.LocalDate;
 
 public class AdminDAO {
-	
-	
+
+	// 현재 날짜 구하는 변수
+	private LocalDate now = LocalDate.now();
+
 	public List<Admin> info() {
-		
+
 		List<Admin> result = new ArrayList<Admin>();
-		
+
 		String sql = "";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String courseCode = rs.getString("courseCode");
 				String courseName = rs.getString("courseName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setCourseCode(courseCode);
 				m.setCourseName(courseName);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -55,10 +57,9 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
-		
-		
+
 	}
 
 	// -----------------------------------------------
@@ -69,32 +70,32 @@ public class AdminDAO {
 
 	public List<Admin> courseList() {
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
+
+		String sql = "SELECT courseCode,courseName FROM course_";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String courseCode = rs.getString("courseCode");
 				String courseName = rs.getString("courseName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setCourseCode(courseCode);
 				m.setCourseName(courseName);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -111,36 +112,32 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 	}
-	
-	
-	
 
 	// 1.1.1 과정입력
 
 	public int courseAdd(String value) {
-		
+
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "INSERT INTO course_(courseCode,courseName) VALUES ((SELECT CONCAT('COU', LPAD(NVL(SUBSTR(MAX(courseCode), 4), 0) + 1, 3, 0)) AS newCourseCode FROM course_),?)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -155,9 +152,9 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
-		
+
 	}
 
 	// 1.1.2 과정삭제
@@ -165,24 +162,23 @@ public class AdminDAO {
 	public int courseDelete(String value) {
 
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "DELETE FROM course_ WHERE courseCode = ?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -197,43 +193,42 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
-	
-	
-	//1.1.2 과정 삭제 가능 리스트
-	
+
+	// 1.1.2 과정 삭제 가능 리스트
+
 	public List<Admin> courseDeleteList() {
 		List<Admin> result = new ArrayList<Admin>();
-		
-		//삭제 쿼리문
-		String sql = "";
+
+		// 삭제 쿼리문
+		String sql = "SELECT c.courseCode, c.CourseName FROM course_ c, openCourse_ oc WHERE  c.courseCode = oc.courseCode(+) AND oc.courseCode IS NULL GROUP BY c.courseCode, c.courseName";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String courseCode = rs.getString("courseCode");
 				String courseName = rs.getString("courseName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setCourseCode(courseCode);
 				m.setCourseName(courseName);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -250,48 +245,43 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 	}
-	
-	//과정 이름 물어보는 메소드
-	public List<Admin>courseNameList(String value) {
-		
+
+	// 과정 이름 물어보는 메소드
+	public List<Admin> courseNameList(String value) {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
-		sql += " AND courseCode = ?";
+
+		String sql = "SELECT courseCode,courseName FROM course_ WHERE courseCode=?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String courseCode = rs.getString("courseCode");
 				String courseName = rs.getString("courseName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setCourseCode(courseCode);
 				m.setCourseName(courseName);
-				
-				
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -308,10 +298,8 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
-		
+		return result;
 
 	}
 
@@ -320,34 +308,34 @@ public class AdminDAO {
 	public List<Admin> subjectList() {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
+
+		String sql = "SELECT subjectCode,subjectName FROM subject_";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String subjectCode = rs.getString("subjectCode");
 				String subjectName = rs.getString("subjectName");
 				String bookName = rs.getString("bookName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setSubjectCode(subjectCode);
 				m.setSubjectName(subjectName);
 				m.setBookName(bookName);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -364,7 +352,7 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
@@ -372,27 +360,25 @@ public class AdminDAO {
 	// 1.2.1 과목입력
 
 	public int subjectAdd(String value) {
-		
+
 		int result = 0;
-		
-		//subjectCode자동증가
-		String sql = "";
+
+		String sql = "INSERT INTO subject_(subjectCode,subjectName) VALUES ((SELECT CONCAT('SUB', LPAD(NVL(SUBSTR(MAX(subjectCode), 4), 0) + 1, 3, 0)) AS newSubjectCode FROM subject_),?)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
-			
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -407,9 +393,9 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
-		
+
 	}
 
 	// 1.2.2 과목삭제
@@ -417,24 +403,23 @@ public class AdminDAO {
 	public int subjectDelete(String value) {
 
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "DELETE FROM subject_ WHERE subjectCode = ?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -449,43 +434,43 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
-	
+
 	// 1.2.2 과목 삭제 가능 리스트
-	
+
 	public List<Admin> subjectDeleteList() {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		//삭제 쿼리문
-		String sql = "";
+
+		// 삭제 쿼리문
+		String sql = "SELECT s.subjectCode, s.subjectName FROM subject_ s, openSubject_ os WHERE  s.subjectCode = os.subjectCode(+) AND os.subjectCode IS NULL GROUP BY  s.subjectCode, s.subjectName";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String subjectCode = rs.getString("subjectCode");
 				String subjectName = rs.getString("subjectName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setSubjectCode(subjectCode);
 				m.setSubjectName(subjectName);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -502,49 +487,44 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
-	
-	//과목이름 물어보는 메소드
-	public List<Admin>subjectList(String value) {
-		
+
+	// 과목이름 물어보는 메소드
+	public List<Admin> subjectList(String value) {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
-		sql += " AND subjectCode = ?";
-		
+
+		String sql = "SELECT subjectCode,subjectName FROM subject_ WHERE subjectCode =?";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String courseCode = rs.getString("subjectCode");
 				String courseName = rs.getString("subjectName");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setCourseCode(courseCode);
 				m.setCourseName(courseName);
-				
-				
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -561,10 +541,8 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
-		
+		return result;
 
 	}
 
@@ -573,34 +551,34 @@ public class AdminDAO {
 	public List<Admin> classList() {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
+
+		String sql = "SELECT classCode,className,classQuota FROM class_";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String classCode = rs.getString("classCode");
 				String className = rs.getString("className");
 				String classQuota = rs.getString("classQuota");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setClassCode(classCode);
 				m.setClassName(className);
 				m.setClassQuota(Integer.parseInt(classQuota));
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -617,35 +595,34 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
 
 	// 1.3.1 강의실 입력
 
-	public int classAdd(String value1,int value2) {
+	public int classAdd(String value1, int value2) {
 
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "INSERT INTO class_(classCode,className,classQuota) VALUES ((SELECT CONCAT('CLA', LPAD(NVL(SUBSTR(MAX(CLA), 4), 0) + 1, 3, 0)) AS newClassCode FROM class_),?,?,?)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value1);
-			pstmt.setInt(2,value2);
-			
-			
+
+			pstmt.setString(1, value1);
+			pstmt.setInt(2, value2);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -660,7 +637,7 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
@@ -670,24 +647,23 @@ public class AdminDAO {
 	public int classDelete(String value) {
 
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "DELETE FROM class_ WHERE classCode=?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -702,43 +678,43 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 	}
-	
-	//1.3.2 강의실 삭제 가능 리스트
+
+	// 1.3.2 강의실 삭제 가능 리스트
 	public List<Admin> classDeleteList() {
-		
+
 		List<Admin> result = new ArrayList<Admin>();
-		
-		//삭제 쿼리
-		String sql = "";
+
+		// 삭제 쿼리
+		String sql = "SELECT c.classCode, c.className FROM class_ c, openCourse_ oc WHERE  c.classCode = oc.classCode(+) AND oc.classCode IS NULL GROUP BY  c.classCode, c.className";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String classCode = rs.getString("classCode");
 				String className = rs.getString("className");
 				String classQuota = rs.getString("classQuota");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setClassCode(classCode);
 				m.setClassName(className);
 				m.setClassQuota(Integer.parseInt(classQuota));
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -755,49 +731,44 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
-	
-	//강의실 물어보는 메소드
-	public List<Admin>classList(String value) {
-		
+
+	// 강의실 물어보는 메소드
+	public List<Admin> classList(String value) {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
-		sql += " AND classCode = ?";
-		
+
+		String sql = "SELECT classCode,className FROM class_";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String classCode = rs.getString("classCode");
 				String className = rs.getString("className");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setClassCode(classCode);
 				m.setClassName(className);
-				
-				
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -814,46 +785,44 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
-		
+		return result;
 
 	}
 
 	// 1.4 교재 관리
 
 	public List<Admin> bookList() {
-		
+
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
+
+		String sql = "SELECT bookCode,bookName,bookPublisher FROM books_";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String bookCode = rs.getString("bookCode");
 				String bookName = rs.getString("bookName");
 				String bookPublisher = rs.getString("bookPublisher");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setBookCode(bookCode);
 				m.setBookName(bookName);
 				m.setBookPublisher(bookPublisher);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -870,35 +839,34 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
+		return result;
 
 	}
 
 	// 1.4.1 교재 입력
 
-	public int bookAdd(String value1,String value2) {
+	public int bookAdd(String value1, String value2) {
 
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "INSERT INTO books_(bookCode,bookName,bookPublisher) VALUES ((SELECT CONCAT('BOK', LPAD(NVL(SUBSTR(MAX(bookCode), 4), 0) + 1, 3, 0)) AS newBookCode FROM books_),?,?)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value1);
-			pstmt.setString(2,value2);
-			
+
+			pstmt.setString(1, value1);
+			pstmt.setString(2, value2);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -913,33 +881,32 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 	}
 
 	// 1.4.2 교재 삭제
 
 	public int bookDelete(String value) {
-		
+
 		int result = 0;
-		
-		String sql = "";
+
+		String sql = "DELETE FROM books_ WHERE bookCode=?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -954,43 +921,43 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 	}
-	
+
 	// 1.4.2 교재 삭제 가능 목록
 	public List<Admin> bookDeleteList() {
-		
+
 		List<Admin> result = new ArrayList<Admin>();
-		
-		//삭제 쿼리
-		String sql = "";
+
+		// 삭제 쿼리
+		String sql = "SELECT b.bookCode, b.bookName FROM books_ b, openSubject_ os WHERE  b.bookCode = os.bookCode(+) AND  os.bookCode IS NULL GROUP BY  b.bookCode, b.bookName";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String bookCode = rs.getString("bookCode");
 				String bookName = rs.getString("bookName");
 				String bookPublisher = rs.getString("bookPublisher");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setBookCode(bookCode);
 				m.setBookName(bookName);
 				m.setBookPublisher(bookPublisher);
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1007,52 +974,46 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
+		return result;
 
 	}
-	
-	//교재 물어보는 메소드
-	public List<Admin>bookList(String value) {
-		
+
+	// 교재 물어보는 메소드
+	public List<Admin> bookList(String value) {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
-		sql += " AND bookCode = ?";
-		
+
+		String sql = "SELECT bookCode,bookName,bookPublisher FROM books_";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String bookCode = rs.getString("bookCode");
 				String bookName = rs.getString("bookName");
 				String bookPublisher = rs.getString("bookPublisher");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setBookCode(bookCode);
 				m.setBookName(bookName);
 				m.setBookPublisher(bookPublisher);
-				
-				
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1069,29 +1030,22 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
-		
+		return result;
 
 	}
 
 	// -----------------------------------------------
 
 	// 2. 강사 계정 관리
-	
-	
-	//현재 날짜 구하는 변수
-	private LocalDate now = LocalDate.now();
-	
-	//회원번호,이름 구하는 메소드
-	public List<Admin>midNameList(String value) {
-		
+
+	// 회원번호, 이름 구하는 메소드
+	public List<Admin> midNameList(String value) {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
+
+		String sql = "SELECT mid,name_ FROM member_";
+
 		sql += " WHERE memberStatus = I";
 		sql += " AND mid = ?";
 
@@ -1099,29 +1053,28 @@ public class AdminDAO {
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String mid = rs.getString("mid");
 				String name_ = rs.getString("name_");
-				
+
 				Admin m = new Admin();
-				
-				m.setMid(mid); 
+
+				m.setMid(mid);
 				m.setName_(name_);
-				
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1138,58 +1091,63 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
-
-		
-
 	}
-	
-	
-	
+
 	// 2.1 강사 목록
 
-	public List<Admin>InstructorList() {
-		
+	public List<Admin> InstructorList() {
 
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
-		sql += " WHERE memberStatus = I";
 
+		/*
+		 * SELECT m.mid, m.name_, m.ssn, m.phone, s.subjectName, i.instructorRegDate
+		 * FROM member_ m, instructor_ i, checkSubject_ c, subject_ s WHERE m.mid =
+		 * i.mid AND c.mid = i.mid AND s.subjectCode = c.subjectCode ORDER BY m.mid;
+		 */
+
+		// 강사고유번호, 이름, 주민등록번호 뒷자리, 전화번호, 강의가능과목, 강사등록일
+		String sql = "SELECT m.mid, m.name_, m.ssn, m.phone, s.subjectName, i.instructorRegDate FROM member_ m, instructor_ i, checkSubject_ c, subject_ s WHERE m.mid = i.mid AND c.mid = i.mid AND s.subjectCode = c.subjectCode ORDER BY m.mid";
+		int i = 0;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
 			pstmt = conn.prepareStatement(sql);
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String mid = rs.getString("mid");
 				String name_ = rs.getString("name_");
 				String ssn = rs.getString("ssn");
 				String phone = rs.getString("phone");
 				String subjectName = rs.getString("subjectName");
-				String instructorRegDate = rs.getString("instructorRegDate");
-				
+				LocalDate instructorRegDate = rs.getDate("instructorRegDate").toLocalDate();
+
 				Admin m = new Admin();
-				
-				m.setMid(mid); 
+
+				m.setMid(mid);
 				m.setName_(name_);
 				m.setSsn(ssn);
 				m.setPhone(phone);
-				m.setSubjectCode(subjectName);
-				m.setInstructorRegDate(LocalDate.parse(instructorRegDate));
-				
-				
-				result.add(m);
-				
+				m.setSubjectName(subjectName);
+				m.setInstructorRegDate(instructorRegDate);
+
+				if (result.size() == 0) {
+					result.add(m);
+				} else if (result.get(i).getMid().equals(mid)) {
+					result.get(i).setSubjectName(String.format("%s / %s", result.get(i).getSubjectName(), subjectName));
+				} else {
+					result.add(m);
+					++i;
+				}
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1206,69 +1164,75 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
-
-		
-
 	}
 
 	// 2.1.1 강사상세보기
 
-	public List<Admin> InstructorSubjectDetailList(String value) {
-		
+	public List<Admin> InstructorSubjectDetailList(String mid) {
+
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		   sql += " WHERE mid = ?";
-		   sql += " AND memberStatus = I";
-		
+		// [MEM002 / 장혜진]강사님
+		// 강의 과목 / 개설 과목 코드 / 과목 시작일 / 과목 종료일 / 개설 과정 / 개설과정명 / 과정 시작일 / 과정 종료일 / 강의실 /
+		// 강의상태
+		/*
+		 * CREATE OR REPLACE VIEW detailInstructor AS SELECT s.subjectName,
+		 * p.openSubCode, p.openSubStartDate, p.openSubCloseDate, o.openCoCode,
+		 * c.courseName, o.openCoStartDate, o.openCoCloseDate, l.className, k.mid FROM
+		 * checkSubject_ k, subject_ s, openCourse_ o, course_ c, class_ l, openSubject_
+		 * p WHERE p.mid = k.mid AND k.subjectCode = s.subjectCode AND s.subjectCode =
+		 * p.subjectCode AND o.openCoCode = p.openCoCode AND o.classCode = l.classCode
+		 * AND o.courseCode = c.courseCode AND p.subjectCode = s.subjectCode;
+		 */
+		String sql = "SELECT subjectName, openSubCode, openSubStartDate, openSubCloseDate, openCoCode, courseName, openCoStartDate, openCoCloseDate, className FROM detailInstructor WHERE mid = ?";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1, value);
-			
+
+			pstmt.setString(1, mid);
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String subjectName = rs.getString("subjectName");
 				String openSubCode = rs.getString("openSubCode");
-				String openSubStartDate = rs.getString("openSubStartDate");
-				String openSubCloseDate = rs.getString("openSubCloseDate");
+				LocalDate openSubStartDate = rs.getDate("openSubStartDate").toLocalDate();
+				LocalDate openSubCloseDate = rs.getDate("openSubCloseDate").toLocalDate();
 				String courseName = rs.getString("courseName");
-				String openCoStartDate = rs.getString("openCoStartDate");
-				String openCoCloseDate = rs.getString("openCoCloseDate");
+				LocalDate openCoStartDate = rs.getDate("openCoStartDate").toLocalDate();
+				LocalDate openCoCloseDate = rs.getDate("openCoCloseDate").toLocalDate();
 				String className = rs.getString("className");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setSubjectName(subjectName);
 				m.setOpenSubCode(openSubCode);
-				m.setOpenSubStartDate(LocalDate.parse(openSubStartDate));
-				m.setOpenSubCloseDate(LocalDate.parse(openSubCloseDate));
+				m.setOpenSubStartDate(openSubStartDate);
+				m.setOpenSubCloseDate(openSubCloseDate);
 				m.setCourseName(courseName);
-				m.setOpenCoStartDate(LocalDate.parse(openCoStartDate));
-				m.setOpenCoCloseDate(LocalDate.parse(openCoCloseDate));
+				m.setOpenCoStartDate(openCoStartDate);
+				m.setOpenCoCloseDate(openCoCloseDate);
 				m.setClassName(className);
-				
-				if(m.getOpenCoCloseDate().isAfter(now)) {
+
+				if (m.getOpenCoCloseDate().isAfter(now)) {
 					m.setInstStatus("강의종료");
 				} else if (m.getOpenCoCloseDate().isBefore(now) && m.getOpenCoStartDate().isBefore(now)) {
 					m.setInstStatus("강의중");
 				} else {
 					m.setInstStatus("강의 예정");
 				}
-				
+
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1285,44 +1249,34 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
-		return result;
 
-		
-		
+		return result;
 
 	}
 
 	// 2.1.2 강의가능과목 추가
 
-	public int InstructorSubjectAdd(String mid,String subjectCode) {
+	public int InstructorSubjectAdd(String mid, String subjectCode) {
 
 		int result = 0;
-		
-		String sql = "";
-			
-		   
-		   
-		   sql += " AND memberStatus = I";
-	
+
+		String sql = "INSERT INTO checkSubject_(mid,subjectCode) VALUES (?,?)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			
-			pstmt.setString(1,mid);
-			pstmt.setString(2,subjectCode);
-			
-			
+
+			pstmt.setString(1, mid);
+			pstmt.setString(2, subjectCode);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -1337,37 +1291,34 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
 
 	// 2.1.3 강의가능과목 삭제
 
-	public int InstructorSubjectDelete(String mid,String subjectCode) {
+	public int InstructorSubjectDelete(String mid, String subjectCode) {
 
 		int result = 0;
-		
-		String sql = "";
-		
-		   sql += " AND memberStatus = I";
 
+		String sql = "DELETE FROM checkSubject_ WHERE mid=? AND subjectCode = ?";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,mid);
-			pstmt.setString(2,subjectCode);
-			
+
+			pstmt.setString(1, mid);
+			pstmt.setString(2, subjectCode);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -1382,41 +1333,42 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
-	
-	//2.2 강사 등록 출력 리스트
+
+	// 2.2 강사 등록 출력 리스트
 	public List<Admin> InstructorAddList(String value) {
-		
+
 		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
+
+		String sql = "SELECT mid,name_,ssn,phone,memberRegDate,memberStatus FROM member_";
 		sql += " WHERE name_ = ? ";
-		
+		sql += " AND memberStatus = S";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, value);
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String mid = rs.getString("mid");
 				String name_ = rs.getString("name_");
 				String ssn = rs.getString("ssn");
 				String phone = rs.getString("phone");
 				String memberRegDate = rs.getString("memberRegDate");
 				String memberStatus = rs.getString("memberStatus");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setMid(mid);
 				m.setName_(name_);
 				m.setSsn(ssn);
@@ -1425,10 +1377,10 @@ public class AdminDAO {
 				m.setMemberStatus(memberStatus);
 
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1445,35 +1397,96 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
+	
+	public List<Admin> InstructorAddList(String value1,String value2) {
 
+		List<Admin> result = new ArrayList<Admin>();
+
+		String sql = "SELECT mid,name_,ssn,phone,memberRegDate,memberStatus FROM member_";
+		sql += " WHERE name_ = ? ";
+		sql += " AND ssn = ?";
+		sql += " AND memberStatus = S";
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setString(1, value);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+
+				String mid = rs.getString("mid");
+				String name_ = rs.getString("name_");
+				String ssn = rs.getString("ssn");
+				String phone = rs.getString("phone");
+				String memberRegDate = rs.getString("memberRegDate");
+				String memberStatus = rs.getString("memberStatus");
+
+				Admin m = new Admin();
+
+				m.setMid(mid);
+				m.setName_(name_);
+				m.setSsn(ssn);
+				m.setPhone(phone);
+				m.setMemberRegDate(LocalDate.parse(memberRegDate));
+				m.setMemberStatus(memberStatus);
+
+				result.add(m);
+
+			}
+			rs.close();
+
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+
+		return result;
+
+	}
 	// 2.2 강사 등록(기존회원)
 
 	public int InstructorAdd(String value) {
 
 		int result = 0;
-		
-		
-		String sql = "";
-		
+
+		String sql = "INSERT INTO instructor_(mid,instructorRegDate) VALUES (?,SYSDATE)";
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -1488,39 +1501,38 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
 	
-	//2.2 강사등록 (신규회원)
-	public int InstructorAddNew(String name_,String ssn,String phone,String memberRegDate) {
+	
+
+	// 2.2 강사등록 (신규회원)
+	public int InstructorAddNew(String name_, String ssn, String phone, String memberRegDate) {
 
 		int result = 0;
-		
-		
-		String sql = "";
-		
 
+		String sql = "INSERT INTO member_(mid,memberStatus,name_,ssn,phone,memberRegDate) VALUES ((SELECT CONCAT('MEM', LPAD(NVL(SUBSTR(MAX(mid), 4), 0) + 1, 3, 0)) AS newMid FROM member_),'I',?,?,?,?)";
+		
+		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
+
 			pstmt.setString(1, "name_");
 			pstmt.setString(2, "ssn");
 			pstmt.setString(3, "phone");
 			pstmt.setString(4, "memberRegDate");
-			
-			
-			
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -1535,49 +1547,114 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
+	
+	public List<Admin> memberList(String value1,String value2){
+		
+		List<Admin> result = new ArrayList<Admin>();
+
+		String sql = "SELECT mid,name_,ssn,phone,memberRegDate,memberStatus FROM member_";
+		sql += " WHERE name_ = ? ";
+		sql += " AND ssn = ?";
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			conn = SQLConnection.connect();
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setString(1, value1);
+			pstmt.setString(2, value2);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+
+				String mid = rs.getString("mid");
+				String name_ = rs.getString("name_");
+				String ssn = rs.getString("ssn");
+				String phone = rs.getString("phone");
+				String memberRegDate = rs.getString("memberRegDate");
+				String memberStatus = rs.getString("memberStatus");
+
+				Admin m = new Admin();
+
+				m.setMid(mid);
+				m.setName_(name_);
+				m.setSsn(ssn);
+				m.setPhone(phone);
+				m.setMemberRegDate(LocalDate.parse(memberRegDate));
+				m.setMemberStatus(memberStatus);
+
+				result.add(m);
+
+			}
+			rs.close();
+
+		} catch (SQLException se) {
+			System.out.print(se.getMessage());
+		} catch (Exception e) {
+			System.out.print(e.getMessage());
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+			} catch (SQLException se) {
+			}
+			try {
+				SQLConnection.close();
+			} catch (SQLException se) {
+				System.out.print(se.getMessage());
+			}
+		}
+
+		return result;
+		
+
+	}
+	
+
 
 	// 2.3 강사 삭제
 
 	// [삭제 가능 강사] -> (cf.개설과목등록여부로 판단, 강의가능과목은 cascade옵션 사용,
 
 	// 강사와 회원가입테이블 같이 DELETE)
-	
-	//2.2 강사 등록 출력 리스트
-	public List<Admin> InstructorDeleteList() {
-		
-		List<Admin> result = new ArrayList<Admin>();
-		
-		String sql = "";
-		
-		   sql += " WHERE name_ = ? ";
-		   sql += " AND memberStatus = I";
 
-		
+	// 2.2 강사 등록 출력 리스트
+	public List<Admin> InstructorDeleteList() {
+
+		List<Admin> result = new ArrayList<Admin>();
+
+		String sql = "";
+
+		sql += " WHERE name_ = ? ";
+		sql += " AND memberStatus = I";
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			
+
 			ResultSet rs = pstmt.executeQuery();
-			
+
 			while (rs.next()) {
-				
+
 				String mid = rs.getString("mid");
 				String name_ = rs.getString("name_");
 				String ssn = rs.getString("ssn");
 				String phone = rs.getString("phone");
 				String subjectName = rs.getString("subjectName");
 				String instructorRegDate = rs.getString("instructorRegDate");
-				
+
 				Admin m = new Admin();
-				
+
 				m.setMid(mid);
 				m.setName_(name_);
 				m.setSsn(ssn);
@@ -1586,10 +1663,10 @@ public class AdminDAO {
 				m.setInstructorRegDate(LocalDate.parse(instructorRegDate));
 
 				result.add(m);
-				
+
 			}
 			rs.close();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
 		} catch (Exception e) {
@@ -1606,33 +1683,31 @@ public class AdminDAO {
 				System.out.print(se.getMessage());
 			}
 		}
-		
+
 		return result;
 
 	}
-	
 
 	public int InstructorDelete(String value) {
 
 		int result = 0;
-		
+
 		String sql = "";
-		
 
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = SQLConnection.connect();
-			
+
 			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1,value);
-			
+
+			pstmt.setString(1, value);
+
 			result = pstmt.executeUpdate();
-			
+
 		} catch (SQLException se) {
 			System.out.print(se.getMessage());
-			
+
 		} catch (Exception e) {
 			System.out.print(e.getMessage());
 		} finally {
@@ -1651,14 +1726,6 @@ public class AdminDAO {
 		return result;
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 
 	// -----------------------------------------------
 
@@ -2017,5 +2084,6 @@ public class AdminDAO {
 		return result;
 
 	}
+
 
 }
